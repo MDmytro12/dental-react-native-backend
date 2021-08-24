@@ -77,11 +77,12 @@ const update = async function (req , res) {
 }
 
 const show = async function(req , res){
-    const {id} = req.body
+    const {id} = req.params 
     
     try{
-        const patient = await Patient.findById(id).exec();
-        return res.status(200).json({data : patient})
+        const patient = await Patient.findById(id).populate('appointments').exec();
+
+        return res.status(200).json({...patient._doc , appointments : patient.appointments })
     }catch(e){
         return res.status(400).json({message : 'This patient doesn`t exists!'})
     }

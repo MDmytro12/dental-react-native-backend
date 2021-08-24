@@ -1,9 +1,12 @@
 const {Appointment , Patient} = require('../models')
 const {validationResult} = require('express-validator')
+const {groupBy , reduce} = require('lodash')
+const ukLocale = require('dayjs/locale/uk')
+const dayjs = require('dayjs')
 
 function AppointmentController() {}
 
-const create = function (req , res) {
+const create = function (req , res) { 
     const errors = validationResult(req)
 
     if(!errors.isEmpty()){
@@ -11,7 +14,7 @@ const create = function (req , res) {
     }
 
     const data = {
-        patientId : req.body.patientId ,
+        patientId : req.body.patientId , 
         dentNumber : req.body.dentNumber ,
         diagnostic : req.body.diagnostic ,
         price : req.body.price ,
@@ -29,7 +32,8 @@ const create = function (req , res) {
 
 }
 
-const all = function(req , res) {
+const all = function(req , res) {   
+    
      Appointment.find({})
                 .populate('patientId')
                 .exec(function (err , doc){
@@ -37,11 +41,17 @@ const all = function(req , res) {
                         return res.status(500).json({message : "Error on get appointments!" , err})
                     }
 
-                    res.json({
-                        data : doc
+                    return res.status(200).json({  
+                        data : reduce(
+                            groupBy(doc , 'date') , (result , value , key) => {
+                                result = [ ...result , {title : dayjs(key).locale(ukLocale).format('D MMMM')  , data : value} ]
+                                return result   
+                                } ,
+                                []
+                                )
                     })
                 });
-}
+}   
 
 const remove = async function (req , res) {
     const {id} = req.params

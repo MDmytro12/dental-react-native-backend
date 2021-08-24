@@ -5,8 +5,9 @@ const db = require('./core/db')
 const patientValidation = require('./utils/validation/patient')
 const appointmentValidation = require('./utils/validation/appointment')
 
-const app = express()
 
+const app = express()
+ 
 app.use(cors({origin : "*"}))
 app.use(express.json())
 app.use(express.urlencoded( { extended : true } ))
@@ -17,7 +18,7 @@ app.get('/patients' , PatientCtrl.all)
 app.post('/patient' , patientValidation.create , PatientCtrl.create)
 app.delete('/patient/:id' , PatientCtrl.remove)
 app.patch('/patient' , patientValidation.create , PatientCtrl.update)
-app.get('/patient' , PatientCtrl.show)
+app.get('/patient/:id' , PatientCtrl.show)
 
 app.get('/appointment' , AppointmentCntrl.all )
 app.post('/appointment' , appointmentValidation.create , AppointmentCntrl.create)
@@ -27,7 +28,7 @@ app.patch('/appointment' , appointmentValidation.update , AppointmentCntrl.updat
 app.listen( PORT , (err) => {
     if(err){
         console.log(err)
-        return
+        return 
     }
 
     console.log(`Server runned on port : ${PORT}!`)
